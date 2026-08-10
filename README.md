@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="public/images/b4call-api.png" alt="B4Call" width="440">
+  <img src="public/images/b4call-api_light.png" alt="B4Call" width="440">
 </p>
 
 # B4Call
