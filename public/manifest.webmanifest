@@ -1,0 +1,17 @@
+{
+  "name": "B4Call",
+  "short_name": "B4Call",
+  "description": "Postman-style API client with shareable collections and live collaboration",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f6f5fb",
+  "theme_color": "#ffffff",
+  "icons": [
+    {
+      "src": "/images/b4call-api_light.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

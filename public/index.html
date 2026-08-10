@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="b4call-light" data-scheme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>B4Call</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="icon" type="image/png" href="/images/b4call-api_light.png">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <img src="/images/b4call-api.png" alt="B4Call" class="brand-logo brand-logo-dark">
+      <img src="/images/b4call-api_light.png" alt="B4Call" class="brand-logo brand-logo-light">
+    </div>
+    <button id="global-search-btn" class="btn btn-ghost topbar-search" data-icon="search" title="Search everything (Ctrl+K)">Search…<span class="kbd">Ctrl K</span></button>
+    <div class="topbar-actions">
+      <select id="workspace-select" class="env-select" title="Active workspace"></select>
+      <button id="workspace-btn" class="btn btn-ghost" data-icon="layers" title="Manage workspaces">Workspaces</button>
+      <select id="theme-select" class="theme-select" title="Switch theme"></select>
+      <button id="appearance-btn" class="btn btn-ghost" data-icon="palette" title="Appearance — theme, text size, density"></button>
+      <select id="env-select" class="env-select" title="Active environment"></select>
+      <button id="env-btn" class="btn btn-ghost" data-icon="braces" title="Manage environments">Manage</button>
+      <button id="vault-btn" class="btn btn-ghost" data-icon="lock" title="Local vault — secrets that never leave this browser">Vault</button>
+      <button id="cookies-btn" class="btn btn-ghost" data-icon="cookie" title="Cookie jar">Cookies</button>
+      <button id="mock-btn" class="btn btn-ghost" data-icon="flask" title="Mock server">Mock</button>
+      <button id="backup-btn" class="btn btn-ghost" data-icon="archive" title="Backup and Restore workspace">Backup</button>
+      <button id="help-btn" class="btn btn-ghost" data-icon="keyboard" title="Keyboard shortcuts (?)"></button>
+    </div>
+  </header>
+
+  <div id="share-banner" class="share-banner hidden"></div>
+
+  <main class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-tabs">
+        <button class="sidebar-tab active" data-view="collections">Collections</button>
+        <button class="sidebar-tab" data-view="history">History</button>
+      </div>
+      <div id="collections-view" class="sidebar-view">
+        <button id="new-collection-btn" class="btn btn-block" data-icon="plus">New Collection</button>
+        <button id="import-btn" class="btn btn-block" data-icon="upload">Import — Postman / cURL</button>
+        <input id="sidebar-search" type="text" placeholder="Search name, URL, tag…" spellcheck="false">
+        <div class="sidebar-filter-chips">
+          <button class="chip active" data-filter="">All</button>
+          <button class="chip" data-filter="is:favorite" data-icon="star" data-icon-size="12">Favorites</button>
+        </div>
+        <div id="collections-list" class="collections-list"></div>
+      </div>
+      <div id="history-view" class="sidebar-view hidden">
+        <div id="history-list" class="history-list"></div>
+        <button id="clear-history-btn" class="btn btn-ghost btn-block">Clear history</button>
+      </div>
+    </aside>
+
+    <div id="sidebar-resizer" class="sidebar-resizer" title="Drag to resize"></div>
+
+    <section class="workspace">
+      <div id="tab-bar" class="tab-bar"></div>
+
+      <div class="request-title-bar">
+        <button id="favorite-btn" class="star-btn" title="Mark as favorite"></button>
+        <span id="request-name" class="request-name" title="Click to rename">Untitled request</span>
+        <div class="title-actions">
+          <button id="code-btn" class="btn btn-ghost" data-icon="code" title="Generate code snippet">Code</button>
+          <button id="save-btn" class="btn" data-icon="save">Save</button>
+        </div>
+      </div>
+
+      <div class="url-bar">
+        <select id="method" class="method-select">
+          <option>GET</option>
+          <option>POST</option>
+          <option>PUT</option>
+          <option>PATCH</option>
+          <option>DELETE</option>
+          <option>HEAD</option>
+          <option>OPTIONS</option>
+          <option>WS</option>
+          <option>SSE</option>
+        </select>
+        <div class="var-mirror-wrap">
+          <div id="url-mirror" class="var-mirror"></div>
+          <input id="url" type="text" class="url-input" spellcheck="false"
+                 placeholder="https://api.example.com/users  —  supports {{variables}}">
+        </div>
+        <button id="send-btn" class="btn btn-primary">Send</button>
+      </div>
+
+      <div class="req-tabs">
+        <button class="req-tab active" data-tab="params">Params</button>
+        <button class="req-tab" data-tab="headers">Headers</button>
+        <button class="req-tab" data-tab="body">Body</button>
+        <button class="req-tab" data-tab="auth">Auth</button>
+        <button class="req-tab" data-tab="scripts">Scripts</button>
+        <button class="req-tab" data-tab="capture">Capture &amp; Tests</button>
+        <button class="req-tab" data-tab="docs">Docs</button>
+        <button class="req-tab" data-tab="activity">Activity</button>
+        <button class="req-tab" data-tab="settings">Settings</button>
+      </div>
+
+      <div class="req-panels">
+        <div id="tab-params" class="req-panel">
+          <div id="path-vars-section" class="hidden">
+            <div class="vars-title" style="margin-top:0;">Path variables <span class="modal-note" style="display:inline;">(from <b>:name</b> in the URL)</span></div>
+            <div id="path-vars-editor"></div>
+          </div>
+          <div id="params-title" class="vars-title hidden" style="margin-top:0;">Query params</div>
+          <div id="params-editor"></div>
+        </div>
+        <div id="tab-headers" class="req-panel hidden">
+          <div id="headers-editor"></div>
+        </div>
+        <div id="tab-body" class="req-panel hidden">
+          <div class="body-type-row" id="body-type-row">
+            <label><input type="radio" name="bodyType" value="none" checked> none</label>
+            <label><input type="radio" name="bodyType" value="json"> raw JSON</label>
+            <label><input type="radio" name="bodyType" value="text"> raw text</label>
+            <label><input type="radio" name="bodyType" value="form-urlencoded"> x-www-form-urlencoded</label>
+            <label><input type="radio" name="bodyType" value="form-data"> form-data</label>
+            <label><input type="radio" name="bodyType" value="graphql"> GraphQL</label>
+          </div>
+          <div id="body-graphql" class="body-graphql hidden">
+            <div class="vars-title" style="margin-top:0;">Query</div>
+            <textarea id="graphql-query" class="body-raw" spellcheck="false"
+                      placeholder="query { ... }"></textarea>
+            <div class="vars-title">Variables (JSON)</div>
+            <textarea id="graphql-variables" class="body-raw" spellcheck="false"
+                      style="min-height:80px;" placeholder="{ &quot;id&quot;: 1 }"></textarea>
+          </div>
+          <div id="body-tools" class="body-tools hidden">
+            <button id="beautify-btn" class="btn">Beautify</button>
+            <span id="json-status" class="json-status"></span>
+          </div>
+          <div id="body-raw-wrap" class="body-raw-wrap hidden">
+            <div id="body-gutter" class="body-gutter">1</div>
+            <textarea id="body-raw" class="body-raw" spellcheck="false"
+                      placeholder="{ &quot;name&quot;: &quot;value&quot; }"></textarea>
+          </div>
+          <div id="body-form-editor" class="hidden"></div>
+          <div id="body-files" class="body-files hidden">
+            <div class="vars-title">Files</div>
+            <div id="body-files-list"></div>
+            <button id="add-file-btn" class="btn" data-icon="plus">Add file</button>
+            <input id="file-picker" type="file" multiple class="hidden">
+          </div>
+        </div>
+        <div id="tab-auth" class="req-panel hidden">
+          <select id="auth-type" class="auth-select">
+            <option value="none">No Auth</option>
+            <option value="bearer">Bearer Token</option>
+            <option value="basic">Basic Auth</option>
+            <option value="apikey">API Key</option>
+          </select>
+          <div id="auth-fields" class="auth-fields"></div>
+        </div>
+        <div id="tab-scripts" class="req-panel hidden">
+          <div class="vars-title" style="margin-top: 0px;">Pre-request Script (JavaScript)</div>
+          <p class="modal-note" style="margin-bottom: 6px;">Runs before sending the request. You can access/set variables using the <b>pm</b> sandbox (e.g. <b>pm.environment.set("key", "val")</b>).</p>
+          <textarea id="pre-request-script" class="body-raw" style="min-height: 80px; margin-bottom: 12px; font-family: Consolas, monospace;" placeholder="// Pre-request script runs here..."></textarea>
+          
+          <div class="vars-title">Tests Script (JavaScript)</div>
+          <p class="modal-note" style="margin-bottom: 6px;">Runs after response is received. Write tests using <b>pm.test()</b> and assertions with <b>pm.expect()</b>.</p>
+          <textarea id="tests-script" class="body-raw" style="min-height: 80px; font-family: Consolas, monospace;" placeholder="// pm.test(&quot;Status code is 200&quot;, () => {&#10;//   pm.response.to.have.status(200);&#10;// });"></textarea>
+        </div>
+        <div id="tab-capture" class="req-panel hidden">
+          <div class="vars-title">Capture variables from the response</div>
+          <p class="modal-note">
+            After every send, values are read from the JSON response and saved as variables
+            (into the active environment, or globals if none is selected).
+            Example: path <b>data.token</b> → variable <b>token</b>. Use <b>status</b> to capture the status code.
+          </p>
+          <div id="capture-editor"></div>
+          <div class="vars-title">Tests</div>
+          <p class="modal-note">
+            Checks that run after every send. Left column: <b>status</b>, <b>body-contains</b>,
+            or a JSON path like <b>data.user.id</b>. Right column: expected value
+            (leave empty to only check the path exists).
+          </p>
+          <div id="tests-editor"></div>
+        </div>
+        <div id="tab-docs" class="req-panel hidden">
+          <div class="vars-title" style="margin-top:0;">Tags</div>
+          <p class="modal-note" style="margin-bottom:6px;">Comma-separated labels. Filter by them in the sidebar and global search.</p>
+          <input id="req-tags" type="text" placeholder="e.g. auth, users, v2" spellcheck="false" style="width:100%; margin-bottom:12px;">
+          <div class="vars-title">Documentation (Markdown)</div>
+          <div class="docs-split">
+            <textarea id="req-docs" class="body-raw" spellcheck="false"
+                      placeholder="## Notes&#10;Describe this request, its params, and expected responses…"></textarea>
+            <div id="req-docs-preview" class="docs-preview"></div>
+          </div>
+        </div>
+        <div id="tab-activity" class="req-panel hidden">
+          <div id="activity-body" class="activity-body"></div>
+        </div>
+        <div id="tab-settings" class="req-panel hidden">
+          <div class="settings-grid">
+            <label class="setting-row">
+              <span>Request timeout (ms)</span>
+              <input id="set-timeout" type="number" min="0" max="600000" step="1000" value="30000">
+            </label>
+            <label class="setting-row">
+              <span>Follow redirects</span>
+              <input id="set-follow" type="checkbox" checked>
+            </label>
+            <label class="setting-row">
+              <span>Max redirects</span>
+              <input id="set-max-redirects" type="number" min="0" max="20" value="5">
+            </label>
+            <label class="setting-row">
+              <span>Verify SSL certificate</span>
+              <input id="set-ssl" type="checkbox" checked>
+            </label>
+          </div>
+          <p class="modal-note" style="margin-top:12px;">Timeout <b>0</b> means no timeout. Turning off SSL verification and setting redirect limits are applied by the proxy server for this request only.</p>
+          <button id="open-proxy-btn" class="btn" data-icon="globe" style="margin-top:8px;">Configure outbound proxy…</button>
+        </div>
+      </div>
+
+      <div id="response-resizer" class="response-resizer"></div>
+
+      <section class="response">
+        <div id="response-status" class="response-status hidden"></div>
+        <div id="response-toolbar" class="response-toolbar hidden">
+          <div class="resp-mode-toggles" style="display: flex; gap: 4px; margin-right: auto;">
+            <button id="resp-mode-pretty" class="btn btn-ghost active" style="padding: 3px 8px; font-size: 11px; font-weight: 600;">Pretty</button>
+            <button id="resp-mode-raw" class="btn btn-ghost" style="padding: 3px 8px; font-size: 11px; font-weight: 600;">Raw</button>
+          </div>
+          <div class="resp-filter-wrap">
+            <input id="resp-filter" type="text" placeholder="JSONPath — $.data.items[?(@.id > 3)].name" spellcheck="false" title="Filter the JSON body with JSONPath">
+            <button id="resp-filter-help" class="link-btn" data-icon="help" data-icon-size="13" title="JSONPath syntax and examples"></button>
+            <span id="resp-filter-status" class="resp-filter-status"></span>
+          </div>
+          <input id="resp-search" type="text" placeholder="Search in response…" spellcheck="false">
+          <button id="resp-schema" class="btn" data-icon="schema" title="Infer a JSON Schema / TypeScript types from this response">Schema</button>
+          <button id="resp-save-example" class="btn" data-icon="star" title="Save this response as a named example">Example</button>
+          <button id="resp-copy" class="btn" data-icon="copy">Copy</button>
+          <button id="resp-download" class="btn" data-icon="download">Download</button>
+        </div>
+        <div id="resp-tabs" class="resp-tabs hidden">
+          <button class="resp-tab active" data-rtab="body">Body</button>
+          <button class="resp-tab hidden" data-rtab="preview">Preview</button>
+          <button class="resp-tab" data-rtab="visualize">Visualize</button>
+          <button class="resp-tab hidden" data-rtab="timing">Timing</button>
+          <button class="resp-tab" data-rtab="headers">Headers</button>
+          <button class="resp-tab" data-rtab="cookies">Cookies</button>
+          <button class="resp-tab" data-rtab="tests">Tests</button>
+          <button class="resp-tab" data-rtab="history">History</button>
+          <button class="resp-tab" data-rtab="examples">Examples</button>
+          <button class="resp-tab hidden" data-rtab="diff">Diff</button>
+        </div>
+        <pre id="response-body" class="response-body hidden"></pre>
+        <div id="response-visualize" class="response-body hidden" style="padding:12px; overflow:auto;"></div>
+        <div id="response-timing" class="response-headers hidden"></div>
+        <div id="response-diff" class="response-diff hidden"></div>
+        <div id="response-examples" class="response-headers hidden"></div>
+        <div id="response-json-tree" class="response-body hidden" style="padding: 12px; overflow: auto; background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius);"></div>
+        <iframe id="response-preview" class="response-preview hidden" sandbox="" title="HTML preview"></iframe>
+        <div id="response-binary" class="response-headers hidden"></div>
+        <div id="response-headers" class="response-headers hidden"></div>
+        <div id="response-cookies" class="response-headers hidden"></div>
+        <div id="response-tests" class="response-tests hidden"></div>
+        <div id="response-history" class="response-headers hidden"></div>
+        <div id="response-empty" class="response-empty">Enter a URL and hit <b>Send</b> to see the response</div>
+      </section>
+    </section>
+
+    <div id="right-sidebar-resizer" class="right-sidebar-resizer" title="Drag to resize"></div>
+
+    <aside class="right-sidebar">
+      <div class="right-sidebar-header">Variables</div>
+      <div id="variables-sidebar" class="right-sidebar-body"></div>
+    </aside>
+  </main>
+
+  <div id="modal-backdrop" class="modal-backdrop hidden">
+    <div class="modal">
+      <div class="modal-header">
+        <span id="modal-title"></span>
+        <button id="modal-close" class="btn btn-ghost" data-icon="close" title="Close"></button>
+      </div>
+      <div id="modal-content" class="modal-content"></div>
+      <div id="modal-actions" class="modal-actions"></div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="/js/storage-migrate.js"></script>
+  <script type="module" src="/js/main.js"></script>
+</body>
+</html>

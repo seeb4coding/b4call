@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="b4call-light" data-scheme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API docs — B4Call</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/docs.css">
+  <link rel="icon" type="image/png" href="/images/b4call-api_light.png">
+</head>
+<body class="docs-body">
+  <header class="docs-topbar">
+    <div class="brand">
+      <img src="/images/b4call-api.png" alt="B4Call" class="brand-logo brand-logo-dark">
+      <img src="/images/b4call-api_light.png" alt="B4Call" class="brand-logo brand-logo-light">
+      <span id="docs-title">API documentation</span>
+    </div>
+    <div class="docs-actions">
+      <input id="docs-search" type="text" placeholder="Filter endpoints…" spellcheck="false">
+      <select id="docs-theme" class="theme-select" title="Theme"></select>
+      <button id="docs-print" class="btn" data-icon="printer">Print / PDF</button>
+      <a id="docs-open-app" class="btn" data-icon="externalLink" href="#">Open in B4Call</a>
+    </div>
+  </header>
+
+  <div class="docs-layout">
+    <nav id="docs-toc" class="docs-toc"></nav>
+    <main id="docs-main" class="docs-main">
+      <div class="empty-note">Loading documentation…</div>
+    </main>
+  </div>
+
+  <div id="modal-backdrop" class="modal-backdrop hidden">
+    <div class="modal">
+      <div class="modal-header">
+        <span id="modal-title"></span>
+        <button id="modal-close" class="btn btn-ghost" data-icon="close" title="Close"></button>
+      </div>
+      <div id="modal-content" class="modal-content"></div>
+      <div id="modal-actions" class="modal-actions"></div>
+    </div>
+  </div>
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="/js/storage-migrate.js"></script>
+  <script type="module" src="/js/docs-page.js"></script>
+</body>
+</html>

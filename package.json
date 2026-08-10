@@ -1,0 +1,16 @@
+{
+  "name": "b4call",
+  "version": "0.2.0",
+  "description": "B4Call — Postman-style API client with shareable collections and live collaboration",
+  "main": "server.js",
+  "scripts": {
+    "start": "node --disable-warning=ExperimentalWarning server.js",
+    "dev": "node --disable-warning=ExperimentalWarning --watch server.js",
+    "build": "node scripts/build.js",
+    "check": "node scripts/build.js --check",
+    "test": "node --disable-warning=ExperimentalWarning --test \"test/**/*.test.js\" \"test/**/*.test.mjs\""
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
